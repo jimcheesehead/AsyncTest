@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.txtSrcInput = new System.Windows.Forms.TextBox();
-            this.txtDstInput = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.btnCopy = new System.Windows.Forms.Button();
@@ -40,6 +39,8 @@
             this.btnInpBrowse = new System.Windows.Forms.Button();
             this.btnDstBrowse = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.txtDstInput = new System.Windows.Forms.TextBox();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -50,14 +51,6 @@
             this.txtSrcInput.Size = new System.Drawing.Size(382, 20);
             this.txtSrcInput.TabIndex = 0;
             this.txtSrcInput.Text = "L:\\Pictures\\Public\\Model Shoots\\Skips Studio\\Christina Banks";
-            // 
-            // txtDstInput
-            // 
-            this.txtDstInput.Location = new System.Drawing.Point(136, 29);
-            this.txtDstInput.Name = "txtDstInput";
-            this.txtDstInput.Size = new System.Drawing.Size(382, 20);
-            this.txtDstInput.TabIndex = 1;
-            this.txtDstInput.Text = "M:\\tmp";
             // 
             // label1
             // 
@@ -136,18 +129,38 @@
             this.btnDstBrowse.UseVisualStyleBackColor = true;
             this.btnDstBrowse.Click += new System.EventHandler(this.btnDstBrowse_Click);
             // 
+            // folderBrowserDialog1
+            // 
+            this.folderBrowserDialog1.ShowNewFolderButton = false;
+            // 
+            // backgroundWorker1
+            // 
+            this.backgroundWorker1.WorkerReportsProgress = true;
+            this.backgroundWorker1.WorkerSupportsCancellation = true;
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
+            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
+            // 
+            // txtDstInput
+            // 
+            this.txtDstInput.Location = new System.Drawing.Point(136, 27);
+            this.txtDstInput.Name = "txtDstInput";
+            this.txtDstInput.Size = new System.Drawing.Size(382, 20);
+            this.txtDstInput.TabIndex = 8;
+            this.txtDstInput.Text = "M:\\tmp";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(608, 261);
+            this.Controls.Add(this.txtDstInput);
             this.Controls.Add(this.btnDstBrowse);
             this.Controls.Add(this.btnInpBrowse);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.btnCopy);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.txtDstInput);
             this.Controls.Add(this.txtSrcInput);
             this.Name = "Form1";
             this.Text = "Asynchronous File Copy";
@@ -162,7 +175,6 @@
         #endregion
 
         private System.Windows.Forms.TextBox txtSrcInput;
-        private System.Windows.Forms.TextBox txtDstInput;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button btnCopy;
@@ -173,6 +185,8 @@
         private System.Windows.Forms.Button btnInpBrowse;
         private System.Windows.Forms.Button btnDstBrowse;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.Windows.Forms.TextBox txtDstInput;
     }
 }
 
