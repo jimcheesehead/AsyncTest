@@ -51,7 +51,39 @@ namespace AsyncTest
 
         private async void btnCopy_Click(object sender, EventArgs e)
         {
+            srcPath = txtSrcInput.Text.TrimEnd(new[] { '\\', '/' });
+            dstPath = txtDstInput.Text.TrimEnd(new[] { '\\', '/' });
+
+            // The source path must be vaild and exist. The source and destination paths cannot
+            // be the same.
+            if (checkPathErrors())
+            {
+                return;
+            }
+
+            // If destination directory does not exist ask to create it
+            if (!Directory.Exists(dstPath))
+            {
+                DialogResult dialogResult = MessageBox.Show(
+                   String.Format("Destination directory {0} doesn\'t exist\nCreate it?", dstPath),
+                   "Warning!", MessageBoxButtons.YesNo);
+                if (dialogResult == DialogResult.No)
+                    return;
+
+                // Create the directory
+                try
+                {
+                    Directory.CreateDirectory(dstPath);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Error");
+                    return;
+                }
+            }
+
             fileCount = 0;
+
             var files = Directory.EnumerateFiles(srcPath);
             totalFiles = files.Count();
 
@@ -111,6 +143,44 @@ namespace AsyncTest
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             //ProgressBar.Value = 0;
+        }
+
+        private bool checkPathErrors()
+        {
+            string errMsg;
+
+            if (string.IsNullOrEmpty(srcPath))
+            {
+                errMsg = "Source path not specified";
+                txtSrcInput.Focus();
+            }
+            else if (!Directory.Exists(srcPath))
+            {
+                errMsg = "Soruce path is not a vaild directory";
+                txtSrcInput.Focus();
+            }
+            else if (string.IsNullOrEmpty(dstPath))
+            {
+                errMsg = "Destination path not specified";
+                txtDstInput.Focus();
+            }
+            //else if (!Directory.Exists(dstPath))
+            //{
+            //    errMsg = "Destination path is not a vaild directory";
+            //    txtDstInput.Focus();
+            //}
+            else if (srcPath == dstPath)
+            {
+                errMsg = "Source path and destination path are the same";
+                txtDstInput.Focus();
+            }
+            else
+            {
+                return false; // No errors
+            }
+
+            MessageBox.Show(errMsg);
+            return true;
         }
 
     }
