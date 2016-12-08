@@ -41,6 +41,7 @@
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.txtDstInput = new System.Windows.Forms.TextBox();
+            this.chkBoxDereferenceLinks = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -50,7 +51,7 @@
             this.txtSrcInput.Name = "txtSrcInput";
             this.txtSrcInput.Size = new System.Drawing.Size(382, 20);
             this.txtSrcInput.TabIndex = 0;
-            this.txtSrcInput.Text = "L:\\Pictures\\Public\\Model Shoots\\Skips Studio\\Christina Banks";
+            this.txtSrcInput.Text = "C:\\tmp";
             // 
             // label1
             // 
@@ -149,11 +150,24 @@
             this.txtDstInput.TabIndex = 8;
             this.txtDstInput.Text = "M:\\tmp";
             // 
+            // chkBoxDereferenceLinks
+            // 
+            this.chkBoxDereferenceLinks.AutoSize = true;
+            this.chkBoxDereferenceLinks.Checked = true;
+            this.chkBoxDereferenceLinks.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkBoxDereferenceLinks.Location = new System.Drawing.Point(26, 58);
+            this.chkBoxDereferenceLinks.Name = "chkBoxDereferenceLinks";
+            this.chkBoxDereferenceLinks.Size = new System.Drawing.Size(195, 17);
+            this.chkBoxDereferenceLinks.TabIndex = 9;
+            this.chkBoxDereferenceLinks.Text = " Follow symbolic links when copying";
+            this.chkBoxDereferenceLinks.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(608, 261);
+            this.Controls.Add(this.chkBoxDereferenceLinks);
             this.Controls.Add(this.txtDstInput);
             this.Controls.Add(this.btnDstBrowse);
             this.Controls.Add(this.btnInpBrowse);
@@ -187,6 +201,7 @@
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.TextBox txtDstInput;
+        private System.Windows.Forms.CheckBox chkBoxDereferenceLinks;
     }
 }
 

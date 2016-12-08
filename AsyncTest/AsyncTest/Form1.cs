@@ -10,6 +10,7 @@ using System.Windows.Forms;
 
 using System.IO;
 using System.Threading;
+using FileShortcutHelper;
 
 namespace AsyncTest
 {
@@ -93,16 +94,27 @@ namespace AsyncTest
 
             backgroundWorker1.RunWorkerAsync();
 
+            // Single level copy (does not traverse subdirectories)
+
             foreach (string filename in files)
             {
-                using (FileStream SourceStream = File.Open(filename, FileMode.Open))
+                string path = filename;
+
+                if (chkBoxDereferenceLinks.Checked && ShortcutHelper.IsShortcut(filename))
                 {
-                    using (FileStream DestinationStream = File.Create(dstPath + filename.Substring(filename.LastIndexOf('\\'))))
+                    path = ShortcutHelper.ResolveShortcut(filename);
+                    if (!File.Exists(path)) // Ignore bad link
+                        continue;
+                }
+
+                using (FileStream SourceStream = File.Open(path, FileMode.Open))
+                {
+                    using (FileStream DestinationStream = File.Create(dstPath + path.Substring(path.LastIndexOf('\\'))))
                     {
                         await SourceStream.CopyToAsync(DestinationStream);
+                        fileCount++;
                     }
                 }
-                fileCount++;
             }
 
             MessageBox.Show("Done!");
