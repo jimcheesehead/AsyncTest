@@ -17,6 +17,7 @@ namespace AsyncTest
     public partial class Form1 : Form
     {
         string srcPath, dstPath;
+        int totalDirs;
         int fileCount, totalFiles;
 
         public Form1()
@@ -83,9 +84,64 @@ namespace AsyncTest
                 }
             }
 
+            //fileCount = 0;
+
+            //var dirs = Directory.EnumerateDirectories(srcPath);
+            //var files = Directory.EnumerateFiles(srcPath);
+            //totalDirs = dirs.Count();
+            //totalFiles = files.Count();
+
+            //lblStatus.Text = "Copying " + totalFiles.ToString() + " files";
+            //ProgressBar.Visible = true;
+            //lblPct.Visible = true;
+
+            //backgroundWorker1.RunWorkerAsync();
+
+            //// Single level copy (does not traverse subdirectories)
+
+            //foreach (string filename in files)
+            //{
+            //    string path = filename;
+
+            //    if (chkBoxDereferenceLinks.Checked && ShortcutHelper.IsShortcut(filename))
+            //    {
+            //        path = ShortcutHelper.ResolveShortcut(filename);
+            //        if (!File.Exists(path)) // Ignore bad link
+            //            continue;
+            //    }
+
+            //    using (FileStream SourceStream = File.Open(path, FileMode.Open))
+            //    {
+            //        using (FileStream DestinationStream = File.Create(dstPath + path.Substring(path.LastIndexOf('\\'))))
+            //        {
+            //            await SourceStream.CopyToAsync(DestinationStream);
+            //            fileCount++;
+            //        }
+            //    }
+            //}
+
+            //// Now copy the subdirectories recursively
+            //foreach (string path in dirs)
+            //{
+            //}
+
+            await DirectoryCopy(srcPath, dstPath);
+            Task.WaitAll();
+
+            MessageBox.Show("Done!");
+
+            lblStatus.Text = "Ready";
+            ProgressBar.Visible = false;
+            lblPct.Visible = false;
+        }
+
+        private async Task DirectoryCopy(string srcPath, string dstPath)
+        {
             fileCount = 0;
 
+            var dirs = Directory.EnumerateDirectories(srcPath);
             var files = Directory.EnumerateFiles(srcPath);
+            totalDirs = dirs.Count();
             totalFiles = files.Count();
 
             lblStatus.Text = "Copying " + totalFiles.ToString() + " files";
@@ -117,11 +173,10 @@ namespace AsyncTest
                 }
             }
 
-            MessageBox.Show("Done!");
-
-            lblStatus.Text = "Ready";
-            ProgressBar.Visible = false;
-            lblPct.Visible = false;
+            // Now copy the subdirectories recursively
+            foreach (string path in dirs)
+            {
+            }
         }
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
