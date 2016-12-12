@@ -84,65 +84,12 @@ namespace AsyncTest
                 }
             }
 
-            //fileCount = 0;
 
-            //var dirs = Directory.EnumerateDirectories(srcPath);
-            //var files = Directory.EnumerateFiles(srcPath);
-            //totalDirs = dirs.Count();
-            //totalFiles = files.Count();
-
-            //lblStatus.Text = "Copying " + totalFiles.ToString() + " files";
-            //ProgressBar.Visible = true;
-            //lblPct.Visible = true;
-
-            //backgroundWorker1.RunWorkerAsync();
-
-            //// Single level copy (does not traverse subdirectories)
-
-            //foreach (string filename in files)
-            //{
-            //    string path = filename;
-
-            //    if (chkBoxDereferenceLinks.Checked && ShortcutHelper.IsShortcut(filename))
-            //    {
-            //        path = ShortcutHelper.ResolveShortcut(filename);
-            //        if (!File.Exists(path)) // Ignore bad link
-            //            continue;
-            //    }
-
-            //    using (FileStream SourceStream = File.Open(path, FileMode.Open))
-            //    {
-            //        using (FileStream DestinationStream = File.Create(dstPath + path.Substring(path.LastIndexOf('\\'))))
-            //        {
-            //            await SourceStream.CopyToAsync(DestinationStream);
-            //            fileCount++;
-            //        }
-            //    }
-            //}
-
-            //// Now copy the subdirectories recursively
-            //foreach (string path in dirs)
-            //{
-            //}
-
-            await DirectoryCopy(srcPath, dstPath);
-            Task.WaitAll();
-
-            MessageBox.Show("Done!");
-
-            lblStatus.Text = "Ready";
-            ProgressBar.Visible = false;
-            lblPct.Visible = false;
-        }
-
-        private async Task DirectoryCopy(string srcPath, string dstPath)
-        {
+            totalDirs = 0;
             fileCount = 0;
 
-            var dirs = Directory.EnumerateDirectories(srcPath);
-            var files = Directory.EnumerateFiles(srcPath);
-            totalDirs = dirs.Count();
-            totalFiles = files.Count();
+            totalDirs = totalFiles = 0;
+            totalFiles = getDirFileCount(srcPath);
 
             lblStatus.Text = "Copying " + totalFiles.ToString() + " files";
             ProgressBar.Visible = true;
@@ -150,10 +97,51 @@ namespace AsyncTest
 
             backgroundWorker1.RunWorkerAsync();
 
-            // Single level copy (does not traverse subdirectories)
+
+            await DirectoryCopy(srcPath, dstPath);
+            Task.WaitAll();
+
+            //MessageBox.Show("Done!");
+
+            /***************************
+             * Need to stop the background worker here if it's running
+             */
+
+            lblStatus.Text = "Ready";
+
+            int endTotalFiles = fileCount;
+
+            //ProgressBar.Visible = false;
+            //lblPct.Visible = false;
+        }
+
+        private int getDirFileCount(string srcPath)
+        {
+            var dirs = Directory.EnumerateDirectories(srcPath);
+            var files = Directory.EnumerateFiles(srcPath);
+            totalDirs += dirs.Count();
+            totalFiles += files.Count();
+
+            // Now do the subdirectories
+            foreach (string path in dirs)
+            {
+                getDirFileCount(path);
+            }
+
+            return totalFiles;
+        }
+
+        private async Task DirectoryCopy(string srcPath, string dstPath)
+        {
+            var dirs = Directory.EnumerateDirectories(srcPath);
+            var files = Directory.EnumerateFiles(srcPath);
+
+            
+            // Does not process linked subdirectories yet!
 
             foreach (string filename in files)
             {
+
                 string path = filename;
 
                 if (chkBoxDereferenceLinks.Checked && ShortcutHelper.IsShortcut(filename))
@@ -176,6 +164,19 @@ namespace AsyncTest
             // Now copy the subdirectories recursively
             foreach (string path in dirs)
             {
+                string dirName = path.Substring(path.LastIndexOf('\\'));
+                string fullDirName = dstPath + dirName;
+                // string tmpPath = Path.Combine(dstPath, path.Substring(path.LastIndexOf('\\')));
+
+
+                // If the subdirectory doesn't exist, create it.
+                if (!Directory.Exists(fullDirName))
+                {
+                    Directory.CreateDirectory(fullDirName);
+                }
+
+
+                await DirectoryCopy(path, fullDirName);
             }
         }
 
