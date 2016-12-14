@@ -89,7 +89,11 @@ namespace AsyncTest
             fileCount = 0;
 
             totalDirs = totalFiles = 0;
-            totalFiles = getDirFileCount(srcPath);
+
+            DirOps.DirInfo info;
+
+            info = DirOps.GetDirInfo(srcPath);
+            totalFiles = info.totalFiles; /*************************************************************************/
 
             lblStatus.Text = "Copying " + totalFiles.ToString() + " files";
             ProgressBar.Visible = true;
@@ -115,7 +119,7 @@ namespace AsyncTest
             //lblPct.Visible = false;
         }
 
-        private int getDirFileCount(string srcPath)
+        private int getDirFileCount(string srcPath) // NOT USED ANYMORE
         {
             var dirs = Directory.EnumerateDirectories(srcPath);
             var files = Directory.EnumerateFiles(srcPath);
