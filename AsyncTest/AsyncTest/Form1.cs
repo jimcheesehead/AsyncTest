@@ -95,7 +95,7 @@ namespace AsyncTest
             info = DirOps.GetDirInfo(srcPath);
             totalFiles = info.totalFiles; /*************************************************************************/
 
-            lblStatus.Text = "Copying " + totalFiles.ToString() + " files";
+            lblStatus.Text = "Copying " + totalFiles.ToString() + " files in " + info.totalDirs + " directories";
             ProgressBar.Visible = true;
             lblPct.Visible = true;
 

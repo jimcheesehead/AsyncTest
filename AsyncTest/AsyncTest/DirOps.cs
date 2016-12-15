@@ -33,16 +33,7 @@ namespace AsyncTest
         {
             DirInfo info = new DirInfo();
             InitializeInfo(info);
-
-            //info.totalFiles = 0;
-            //info.totalBytes = 0;
-            //info = GetDirInfo(path, info);
-
             info = GetAllDirInfo(path, info);
-
-
-            // info.totalFiles = countAllFiles(path, 0);
-
             return info;
         }
 
@@ -90,7 +81,17 @@ namespace AsyncTest
             DirInfo inf = info;
 
             var dirs = Directory.EnumerateDirectories(srcPath);
-            inf.totalDirs += dirs.Count();
+            var directories = new List<string>(Directory.GetDirectories(srcPath));
+
+            if (false)
+            {
+                inf.totalDirs += dirs.Count();
+
+            } else
+            {
+                // Get the subdirectories for the specified directory.
+                inf.totalDirs += directories.Count();
+            }
 
             var files = Directory.EnumerateFiles(srcPath);
             //inf.totalFiles += files.Count();
@@ -106,12 +107,13 @@ namespace AsyncTest
                     // Check to see if file is a directory
                     if (currentFile.Extension == String.Empty)
                     {
-                        MessageBox.Show(String.Format("File {0} is a linked directory", currentFile.FullName));
-
-                        // Recursively process this directory
-                        //string srcPath = ShortcutHelper.ResolveShortcut(file.FullName);
-                        //DirectoryCount(srcPath);
-                        continue;
+                        MessageBox.Show(String.Format("File {0} is a linked directory", file));
+                        if (false)
+                        {
+                            string path = ShortcutHelper.ResolveShortcut(file);
+                            directories.Add(path);
+                            continue;
+                        }
                     }
 
                     if (!currentFile.Exists)
@@ -130,7 +132,7 @@ namespace AsyncTest
             }
 
             // Now do the subdirectories
-            foreach (string path in dirs)
+            foreach (string path in directories)
             {
                 inf.totalFiles = countAllFiles(path, inf.totalFiles);
             }
