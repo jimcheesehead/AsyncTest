@@ -105,10 +105,12 @@ namespace AsyncTest
         {
             DirInfo inf = info;
 
-            var dirs = Directory.EnumerateDirectories(srcDir);
-            var files = Directory.EnumerateFiles(srcDir);
+            // Get the subdirectories for the specified directory.
+            var directories = new List<string>(Directory.GetDirectories(srcDir));
+            inf.totalDirs += directories.Count();
 
-            // Does not process linked subdirectories yet!
+            //var dirs = Directory.EnumerateDirectories(srcDir);
+            var files = Directory.EnumerateFiles(srcDir);
 
             foreach (string filename in files)
             {
@@ -119,6 +121,17 @@ namespace AsyncTest
                 if (ShortcutHelper.IsShortcut(filename))
                 {
                     srcFile = ShortcutHelper.ResolveShortcut(filename);
+                    string extension = Path.GetExtension(srcFile);
+
+                    if (extension == String.Empty)
+                    {
+                        MessageBox.Show(String.Format("File {0} is a linked directory", srcFile));
+                        //string path = ShortcutHelper.ResolveShortcut(file);
+                        directories.Add(srcFile);
+                        continue;
+                    }
+
+
                 }
 
                 if (!File.Exists(srcFile))
@@ -152,12 +165,10 @@ namespace AsyncTest
             }
 
             // Now copy the subdirectories recursively
-            foreach (string path in dirs)
+            foreach (string path in directories)
             {
                 string dirName = path.Substring(path.LastIndexOf('\\'));
                 string fullDirName = dstDir + dirName;
-                // string tmpPath = Path.Combine(dstPath, path.Substring(path.LastIndexOf('\\')));
-
 
                 // If the subdirectory doesn't exist, create it.
                 if (!Directory.Exists(fullDirName))
@@ -166,51 +177,6 @@ namespace AsyncTest
                 }
 
                 await asyncDirectoryCopy(path, fullDirName, inf, progressCallback);
-            }
-
-            return inf;
-        }
-
-
-
-        /***********************************************************
-         * NO LONGER USED
-         **********************************************************/
-
-        private static int countAllFiles(string srcPath, int count)
-        {
-            int totalFiles = count;
-
-            var dirs = Directory.EnumerateDirectories(srcPath);
-            //totalDirs += dirs.Count();
-
-            var files = Directory.EnumerateFiles(srcPath);
-            totalFiles += files.Count();
-
-            // Now do the subdirectories
-            foreach (string path in dirs)
-            {
-                totalFiles = countAllFiles(path, totalFiles);
-            }
-
-            return totalFiles;
-
-        }
-
-        private static DirInfo GetDirInfo(string srcPath, DirInfo info)
-        {
-            DirInfo inf = info;
-
-            var dirs = Directory.EnumerateDirectories(srcPath);
-            inf.totalDirs += dirs.Count();
-
-            var files = Directory.EnumerateFiles(srcPath);
-            inf.totalFiles += files.Count();
-
-            // Now do the subdirectories
-            foreach (string path in dirs)
-            {
-                inf.totalFiles = countAllFiles(path, inf.totalFiles);
             }
 
             return inf;
