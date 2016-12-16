@@ -97,6 +97,8 @@ namespace AsyncTest
             info = DirOps.GetDirInfo(srcPath);
             totalFiles = info.totalFiles; /*************************************************************************/
 
+            // Show the the status of the background copying
+
             string text = String.Format("Copying {0} files, {1} folders ({2})",
                 info.totalFiles, info.totalDirs, GetBytesReadable(info.totalBytes));
             if (info.badLinks.Count() > 0)
