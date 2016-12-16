@@ -42,6 +42,7 @@
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.txtDstInput = new System.Windows.Forms.TextBox();
             this.chkBoxDereferenceLinks = new System.Windows.Forms.CheckBox();
+            this.chkBoxOverwrite = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -162,11 +163,22 @@
             this.chkBoxDereferenceLinks.Text = " Follow symbolic links when copying";
             this.chkBoxDereferenceLinks.UseVisualStyleBackColor = true;
             // 
+            // chkBoxOverwrite
+            // 
+            this.chkBoxOverwrite.AutoSize = true;
+            this.chkBoxOverwrite.Location = new System.Drawing.Point(228, 58);
+            this.chkBoxOverwrite.Name = "chkBoxOverwrite";
+            this.chkBoxOverwrite.Size = new System.Drawing.Size(130, 17);
+            this.chkBoxOverwrite.TabIndex = 10;
+            this.chkBoxOverwrite.Text = "Overwrite existing files";
+            this.chkBoxOverwrite.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(608, 261);
+            this.Controls.Add(this.chkBoxOverwrite);
             this.Controls.Add(this.chkBoxDereferenceLinks);
             this.Controls.Add(this.txtDstInput);
             this.Controls.Add(this.btnDstBrowse);
@@ -202,6 +214,7 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.TextBox txtDstInput;
         private System.Windows.Forms.CheckBox chkBoxDereferenceLinks;
+        private System.Windows.Forms.CheckBox chkBoxOverwrite;
     }
 }
 

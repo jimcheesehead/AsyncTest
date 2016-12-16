@@ -101,36 +101,45 @@ namespace AsyncTest
             return info;
         }
 
-        private static async Task<DirInfo> asyncDirectoryCopy(string srcPath, string dstPath, DirInfo info, Action<DirInfo> progressCallback)
+        private static async Task<DirInfo> asyncDirectoryCopy(string srcDir, string dstDir, DirInfo info, Action<DirInfo> progressCallback)
         {
             DirInfo inf = info;
 
-            var dirs = Directory.EnumerateDirectories(srcPath);
-            var files = Directory.EnumerateFiles(srcPath);
+            var dirs = Directory.EnumerateDirectories(srcDir);
+            var files = Directory.EnumerateFiles(srcDir);
 
             // Does not process linked subdirectories yet!
 
             foreach (string filename in files)
             {
 
-                string path = filename;
+                string srcFile = filename;
+                string dstFile;
 
                 if (ShortcutHelper.IsShortcut(filename))
                 {
-                    path = ShortcutHelper.ResolveShortcut(filename);
-                    if (!File.Exists(path)) // Ignore bad link
-                        continue;
+                    srcFile = ShortcutHelper.ResolveShortcut(filename);
                 }
 
-                using (FileStream SourceStream = File.Open(path, FileMode.Open))
+                if (!File.Exists(srcFile)) // Ignore bad link
+                    continue;
+
+                dstFile = dstDir + srcFile.Substring(srcFile.LastIndexOf('\\'));
+
+                // Check to see if destination file exists.
+                // If it does skip it unless overwrite option is true.
+                if (!File.Exists(dstFile))
                 {
-                    using (FileStream DestinationStream = File.Create(dstPath + path.Substring(path.LastIndexOf('\\'))))
+                    using (FileStream SourceStream = File.Open(srcFile, FileMode.Open))
                     {
-                        await SourceStream.CopyToAsync(DestinationStream);
-                        info.totalFiles++;
+                        using (FileStream DestinationStream = File.Create(dstDir + srcFile.Substring(srcFile.LastIndexOf('\\'))))
+                        {
+                            await SourceStream.CopyToAsync(DestinationStream);
+                        }
                     }
                 }
 
+                info.totalFiles++;
                 progressCallback(inf);
             }
 
@@ -138,7 +147,7 @@ namespace AsyncTest
             foreach (string path in dirs)
             {
                 string dirName = path.Substring(path.LastIndexOf('\\'));
-                string fullDirName = dstPath + dirName;
+                string fullDirName = dstDir + dirName;
                 // string tmpPath = Path.Combine(dstPath, path.Substring(path.LastIndexOf('\\')));
 
 
