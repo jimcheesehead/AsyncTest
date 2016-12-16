@@ -157,7 +157,8 @@ namespace AsyncTest
                         }
                     }
 
-                    info.totalBytes += (long)dstFile.Length;
+                    FileInfo f = new FileInfo(dstFile);
+                    info.totalBytes += f.Length;
                 }
 
                 info.totalFiles++;
@@ -176,7 +177,7 @@ namespace AsyncTest
                     Directory.CreateDirectory(fullDirName);
                 }
 
-                await asyncDirectoryCopy(path, fullDirName, inf, progressCallback);
+                inf = await asyncDirectoryCopy(path, fullDirName, inf, progressCallback);
             }
 
             return inf;
