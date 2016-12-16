@@ -121,9 +121,16 @@ namespace AsyncTest
                     srcFile = ShortcutHelper.ResolveShortcut(filename);
                 }
 
-                if (!File.Exists(srcFile)) // Ignore bad link
-                    continue;
+                if (!File.Exists(srcFile))
+                {
+                    // This file had a bad or missing target link
+                    //MessageBox.Show(String.Format("File {0} does not exist", srcFile));
+                    info.badLinks.Add(filename);
+                    info.totalFiles++; // Count it anyway
+                    progressCallback(inf);
 
+                    continue;
+                }
                 dstFile = dstDir + srcFile.Substring(srcFile.LastIndexOf('\\'));
 
                 // Check to see if destination file exists.

@@ -52,7 +52,7 @@
             this.txtSrcInput.Name = "txtSrcInput";
             this.txtSrcInput.Size = new System.Drawing.Size(382, 20);
             this.txtSrcInput.TabIndex = 0;
-            this.txtSrcInput.Text = "C:\\tmp";
+            this.txtSrcInput.Text = "F:\\stuff\\Met-Art 2\\UNSHAVEN";
             // 
             // label1
             // 
@@ -149,7 +149,7 @@
             this.txtDstInput.Name = "txtDstInput";
             this.txtDstInput.Size = new System.Drawing.Size(382, 20);
             this.txtDstInput.TabIndex = 8;
-            this.txtDstInput.Text = "M:\\tmp";
+            this.txtDstInput.Text = "H:\\tmp";
             // 
             // chkBoxDereferenceLinks
             // 
