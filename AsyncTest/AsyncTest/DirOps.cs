@@ -37,6 +37,129 @@ namespace AsyncTest
             return info;
         }
 
+        private static DirInfo GetAllDirInfo(string srcPath, DirInfo info)
+        {
+            DirInfo inf = info;
+
+            // Get the subdirectories for the specified directory.
+            var directories = new List<string>(Directory.GetDirectories(srcPath));
+            inf.totalDirs += directories.Count();
+
+            var files = Directory.EnumerateFiles(srcPath);
+            //inf.totalFiles += files.Count();
+
+            foreach (var file in files)
+            {
+                FileInfo currentFile = new FileInfo(file);
+                if (currentFile.Extension == @".lnk")
+                {
+                    // Change the current file info to the linked target file
+                    currentFile = new FileInfo(ShortcutHelper.ResolveShortcut(file));
+
+                    // Check to see if file is a directory
+                    if (currentFile.Extension == String.Empty)
+                    {
+                        MessageBox.Show(String.Format("File {0} is a linked directory", file));
+                        if (true)
+                        {
+                            string path = ShortcutHelper.ResolveShortcut(file);
+                            directories.Add(path);
+                            continue;
+                        }
+                    }
+
+                    if (!currentFile.Exists)
+                    {
+                        // This file had a bad or missing target link
+                        // MessageBox.Show(String.Format("File {0} does not exist", currentFile.FullName));
+                        info.badLinks.Add(file);
+                        info.totalFiles++; // Count it anyway
+                        continue;
+                    }
+                }
+
+                info.totalFiles++;
+                info.totalBytes += (long)currentFile.Length;
+
+            }
+
+            // Now do the subdirectories
+            foreach (string path in directories)
+            {
+                //inf.totalFiles = countAllFiles(path, inf.totalFiles);
+                inf = GetAllDirInfo(path, inf);
+            }
+
+            return inf;
+        }
+
+        public static async Task<DirInfo> AsyncDirectoryCopy(string srcPath, string dstPath, Action<DirInfo> progressCallback)
+        {
+            DirInfo info = new DirInfo();
+            InitializeInfo(info);
+            info = await asyncDirectoryCopy(srcPath, dstPath, info, progressCallback);
+            return info;
+        }
+
+        private static async Task<DirInfo> asyncDirectoryCopy(string srcPath, string dstPath, DirInfo info, Action<DirInfo> progressCallback)
+        {
+            DirInfo inf = info;
+
+            var dirs = Directory.EnumerateDirectories(srcPath);
+            var files = Directory.EnumerateFiles(srcPath);
+
+            // Does not process linked subdirectories yet!
+
+            foreach (string filename in files)
+            {
+
+                string path = filename;
+
+                if (ShortcutHelper.IsShortcut(filename))
+                {
+                    path = ShortcutHelper.ResolveShortcut(filename);
+                    if (!File.Exists(path)) // Ignore bad link
+                        continue;
+                }
+
+                using (FileStream SourceStream = File.Open(path, FileMode.Open))
+                {
+                    using (FileStream DestinationStream = File.Create(dstPath + path.Substring(path.LastIndexOf('\\'))))
+                    {
+                        await SourceStream.CopyToAsync(DestinationStream);
+                        info.totalFiles++;
+                    }
+                }
+
+                progressCallback(inf);
+            }
+
+            // Now copy the subdirectories recursively
+            foreach (string path in dirs)
+            {
+                string dirName = path.Substring(path.LastIndexOf('\\'));
+                string fullDirName = dstPath + dirName;
+                // string tmpPath = Path.Combine(dstPath, path.Substring(path.LastIndexOf('\\')));
+
+
+                // If the subdirectory doesn't exist, create it.
+                if (!Directory.Exists(fullDirName))
+                {
+                    Directory.CreateDirectory(fullDirName);
+                }
+
+                await asyncDirectoryCopy(path, fullDirName, inf, progressCallback);
+            }
+
+            return inf;
+        }
+
+
+
+        /***********************************************************
+         * NO LONGER USED
+         **********************************************************/
+
         private static int countAllFiles(string srcPath, int count)
         {
             int totalFiles = count;
@@ -69,70 +192,6 @@ namespace AsyncTest
 
             // Now do the subdirectories
             foreach (string path in dirs)
-            {
-                inf.totalFiles = countAllFiles(path, inf.totalFiles);
-            }
-
-            return inf;
-        }
-
-        private static DirInfo GetAllDirInfo(string srcPath, DirInfo info)
-        {
-            DirInfo inf = info;
-
-            var dirs = Directory.EnumerateDirectories(srcPath);
-            var directories = new List<string>(Directory.GetDirectories(srcPath));
-
-            if (false)
-            {
-                inf.totalDirs += dirs.Count();
-
-            } else
-            {
-                // Get the subdirectories for the specified directory.
-                inf.totalDirs += directories.Count();
-            }
-
-            var files = Directory.EnumerateFiles(srcPath);
-            //inf.totalFiles += files.Count();
-
-            foreach (var file in files)
-            {
-                FileInfo currentFile = new FileInfo(file);
-                if (currentFile.Extension == @".lnk")
-                {
-                    // Change the current file info to the linked target file
-                    currentFile = new FileInfo(ShortcutHelper.ResolveShortcut(file));
-
-                    // Check to see if file is a directory
-                    if (currentFile.Extension == String.Empty)
-                    {
-                        MessageBox.Show(String.Format("File {0} is a linked directory", file));
-                        if (false)
-                        {
-                            string path = ShortcutHelper.ResolveShortcut(file);
-                            directories.Add(path);
-                            continue;
-                        }
-                    }
-
-                    if (!currentFile.Exists)
-                    {
-                        // This file had a bad or missing target link
-                        // MessageBox.Show(String.Format("File {0} does not exist", currentFile.FullName));
-                        info.badLinks.Add(file);
-                        info.totalFiles++; // Count it anyway
-                        continue;
-                    }
-                }
-
-                info.totalFiles++;
-                info.totalBytes += (long)currentFile.Length;
-
-            }
-
-            // Now do the subdirectories
-            foreach (string path in directories)
             {
                 inf.totalFiles = countAllFiles(path, inf.totalFiles);
             }

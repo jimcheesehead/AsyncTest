@@ -51,7 +51,7 @@
             this.txtSrcInput.Name = "txtSrcInput";
             this.txtSrcInput.Size = new System.Drawing.Size(382, 20);
             this.txtSrcInput.TabIndex = 0;
-            this.txtSrcInput.Text = "C:\\tmp1";
+            this.txtSrcInput.Text = "C:\\tmp";
             // 
             // label1
             // 

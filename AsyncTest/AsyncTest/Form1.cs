@@ -20,6 +20,8 @@ namespace AsyncTest
         int totalDirs;
         int fileCount, totalFiles;
 
+        public static int FileCount { get; set; }
+
         public Form1()
         {
             InitializeComponent();
@@ -101,8 +103,13 @@ namespace AsyncTest
 
             backgroundWorker1.RunWorkerAsync();
 
-
-            await DirectoryCopy(srcPath, dstPath);
+            if (false)
+            {
+                await DirectoryCopy(srcPath, dstPath);
+            } else
+            {
+                await DirOps.AsyncDirectoryCopy(srcPath, dstPath, progressCallback);
+            }
             Task.WaitAll();
 
             //MessageBox.Show("Done!");
@@ -117,6 +124,11 @@ namespace AsyncTest
 
             //ProgressBar.Visible = false;
             //lblPct.Visible = false;
+        }
+
+        private void progressCallback(DirOps.DirInfo obj)
+        {
+             fileCount = obj.totalFiles;
         }
 
         private int getDirFileCount(string srcPath) // NOT USED ANYMORE
