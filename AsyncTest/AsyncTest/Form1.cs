@@ -234,6 +234,25 @@ namespace AsyncTest
 
         private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            string text;
+
+            if ((e.Cancelled == true))
+            {
+                text = "Canceled!";
+            }
+
+            else if (!(e.Error == null))
+            {
+                text = ("Error: " + e.Error.Message);
+            }
+
+            else
+            {
+                text = "Done!";
+            }
+
+            MessageBox.Show("Background Worker " + text);
+
             //ProgressBar.Value = 0;
         }
 

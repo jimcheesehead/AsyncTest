@@ -124,26 +124,27 @@ namespace AsyncTest
                 if (!File.Exists(srcFile))
                 {
                     // This file had a bad or missing target link
-                    //MessageBox.Show(String.Format("File {0} does not exist", srcFile));
+                    MessageBox.Show(String.Format("File {0} had bad link", filename));
                     info.badLinks.Add(filename);
-                    info.totalFiles++; // Count it anyway
-                    progressCallback(inf);
-
-                    continue;
                 }
-                dstFile = dstDir + srcFile.Substring(srcFile.LastIndexOf('\\'));
-
-                // Check to see if destination file exists.
-                // If it does skip it unless overwrite option is true.
-                if (!File.Exists(dstFile))
+                else
                 {
-                    using (FileStream SourceStream = File.Open(srcFile, FileMode.Open))
+                    dstFile = dstDir + srcFile.Substring(srcFile.LastIndexOf('\\'));
+
+                    // Check to see if destination file exists.
+                    // If it does skip it unless overwrite option is true.
+                    if (!File.Exists(dstFile))
                     {
-                        using (FileStream DestinationStream = File.Create(dstDir + srcFile.Substring(srcFile.LastIndexOf('\\'))))
+                        using (FileStream SourceStream = File.Open(srcFile, FileMode.Open))
                         {
-                            await SourceStream.CopyToAsync(DestinationStream);
+                            using (FileStream DestinationStream = File.Create(dstDir + srcFile.Substring(srcFile.LastIndexOf('\\'))))
+                            {
+                                await SourceStream.CopyToAsync(DestinationStream);
+                            }
                         }
                     }
+
+                    info.totalBytes += (long)dstFile.Length;
                 }
 
                 info.totalFiles++;
