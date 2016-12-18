@@ -19,6 +19,7 @@ namespace AsyncTest
         string srcPath, dstPath;
         int totalDirs;
         int fileCount, totalFiles;
+        string text; // Temporary storage
 
         public static int FileCount { get; set; }
 
@@ -93,34 +94,33 @@ namespace AsyncTest
             totalDirs = totalFiles = 0;
 
             DirOps.DirInfo info;
+            DirOps.Options options = DirOps.Options.TopDirectoryOnly | DirOps.Options.DereferenceLinks;
 
-            info = DirOps.GetDirInfo(srcPath);
-            totalFiles = info.totalFiles; /*************************************************************************/
+            info = DirOps.GetDirInfo(srcPath, options); /*************************************************************************/
+            totalFiles = info.totalFiles;
 
             // Show the the status of the background copying
 
-            string text = String.Format("Copying {0} files, {1} folders ({2})",
+            text = String.Format("Copying {0} files, {1} folders ({2})",
                 info.totalFiles, info.totalDirs, GetBytesReadable(info.totalBytes));
             if (info.badLinks.Count() > 0)
                 text += String.Format(" - {0} bad links", info.badLinks.Count());
             lblStatus.Text = text;
-
-            //lblStatus.Text = "Copying " + totalFiles.ToString() + " files in " + info.totalDirs + " directories";
             ProgressBar.Visible = true;
             lblPct.Visible = true;
 
             backgroundWorker1.RunWorkerAsync();
 
-            if (false)
-            {
-                await DirectoryCopy(srcPath, dstPath);
-            } else
-            {
-                await DirOps.AsyncDirectoryCopy(srcPath, dstPath, progressCallback);
-            }
+            await DirOps.AsyncDirectoryCopy(srcPath, dstPath, progressCallback,
+                chkBoxOverwrite.Checked, options); /*************************************************************************/
             Task.WaitAll();
 
-            //MessageBox.Show("Done!");
+            text = String.Format("Done!\nCopyied {0} files, in {1} folders ({2})",
+                info.totalFiles, info.totalDirs, GetBytesReadable(info.totalBytes));
+            if (info.badLinks.Count() > 0)
+                text += String.Format(" - {0} bad links", info.badLinks.Count());
+
+            MessageBox.Show(text);
 
             /***************************
              * Need to stop the background worker here if it's running
@@ -136,7 +136,7 @@ namespace AsyncTest
 
         private void progressCallback(DirOps.DirInfo obj)
         {
-             fileCount = obj.totalFiles;
+            fileCount = obj.totalFiles;
         }
 
         private int getDirFileCount(string srcPath) // NOT USED ANYMORE
@@ -160,7 +160,7 @@ namespace AsyncTest
             var dirs = Directory.EnumerateDirectories(srcPath);
             var files = Directory.EnumerateFiles(srcPath);
 
-            
+
             // Does not process linked subdirectories yet!
 
             foreach (string filename in files)

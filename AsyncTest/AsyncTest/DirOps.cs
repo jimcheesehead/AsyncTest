@@ -13,26 +13,36 @@ namespace AsyncTest
 {
     static class DirOps
     {
+        [Flags]
+        public enum Options
+        {
+            None = 0x00,
+            DereferenceLinks = 0x01,
+            OverwiteFiles = 0x02,
+            TopDirectoryOnly = 0x04
+        }
+
         public class DirInfo
         {
             public int totalFiles { get; set; }
             public long totalBytes { get; set; }
             public int totalDirs { get; set; }
             public List<string> badLinks = new List<string>();
-
+            public Options dirOpts;
         }
 
-        private static void InitializeInfo(DirInfo info)
+        private static void InitializeInfo(DirInfo info, Options options)
         {
             info.totalDirs = 1; // Because we count the base directory
             info.totalFiles = 0;
             info.totalBytes = 0;
+            info.dirOpts = options;
         }
 
-        public static DirInfo GetDirInfo(string path)
+        public static DirInfo GetDirInfo(string path, Options options = Options.DereferenceLinks)
         {
             DirInfo info = new DirInfo();
-            InitializeInfo(info);
+            InitializeInfo(info, options);
             info = GetAllDirInfo(path, info);
             return info;
         }
@@ -84,24 +94,29 @@ namespace AsyncTest
             }
 
             // Now do the subdirectories
-            foreach (string path in directories)
+            if (!info.dirOpts.HasFlag(Options.TopDirectoryOnly))
             {
-                //inf.totalFiles = countAllFiles(path, inf.totalFiles);
-                inf = GetAllDirInfo(path, inf);
+                foreach (string path in directories)
+                {
+                    //inf.totalFiles = countAllFiles(path, inf.totalFiles);
+                    inf = GetAllDirInfo(path, inf);
+                }
             }
 
             return inf;
         }
 
-        public static async Task<DirInfo> AsyncDirectoryCopy(string srcPath, string dstPath, Action<DirInfo> progressCallback)
+        public static async Task<DirInfo> AsyncDirectoryCopy(string srcPath, string dstPath,
+            Action<DirInfo> progressCallback, bool overwrite = false, Options options = Options.DereferenceLinks)
         {
             DirInfo info = new DirInfo();
-            InitializeInfo(info);
-            info = await asyncDirectoryCopy(srcPath, dstPath, info, progressCallback);
+            InitializeInfo(info, options);
+            info = await asyncDirectoryCopy(srcPath, dstPath, info, progressCallback, overwrite);
             return info;
         }
 
-        private static async Task<DirInfo> asyncDirectoryCopy(string srcDir, string dstDir, DirInfo info, Action<DirInfo> progressCallback)
+        private static async Task<DirInfo> asyncDirectoryCopy(string srcDir, string dstDir, DirInfo info, 
+            Action<DirInfo> progressCallback, bool overwrite)
         {
             DirInfo inf = info;
 
@@ -130,14 +145,12 @@ namespace AsyncTest
                         directories.Add(srcFile);
                         continue;
                     }
-
-
                 }
 
                 if (!File.Exists(srcFile))
                 {
                     // This file had a bad or missing target link
-                    MessageBox.Show(String.Format("File {0} had bad link", filename));
+                    // MessageBox.Show(String.Format("File {0} has a bad link", filename));
                     info.badLinks.Add(filename);
                 }
                 else
@@ -146,7 +159,7 @@ namespace AsyncTest
 
                     // Check to see if destination file exists.
                     // If it does skip it unless overwrite option is true.
-                    if (!File.Exists(dstFile))
+                    if (!File.Exists(dstFile) || overwrite)
                     {
                         using (FileStream SourceStream = File.Open(srcFile, FileMode.Open))
                         {
@@ -166,18 +179,21 @@ namespace AsyncTest
             }
 
             // Now copy the subdirectories recursively
-            foreach (string path in directories)
+            if (!info.dirOpts.HasFlag(Options.TopDirectoryOnly))
             {
-                string dirName = path.Substring(path.LastIndexOf('\\'));
-                string fullDirName = dstDir + dirName;
-
-                // If the subdirectory doesn't exist, create it.
-                if (!Directory.Exists(fullDirName))
+                foreach (string path in directories)
                 {
-                    Directory.CreateDirectory(fullDirName);
-                }
+                    string dirName = path.Substring(path.LastIndexOf('\\'));
+                    string fullDirName = dstDir + dirName;
 
-                inf = await asyncDirectoryCopy(path, fullDirName, inf, progressCallback);
+                    // If the subdirectory doesn't exist, create it.
+                    if (!Directory.Exists(fullDirName))
+                    {
+                        Directory.CreateDirectory(fullDirName);
+                    }
+
+                    inf = await asyncDirectoryCopy(path, fullDirName, inf, progressCallback, overwrite);
+                }
             }
 
             return inf;
