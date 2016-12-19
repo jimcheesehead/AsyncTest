@@ -18,7 +18,7 @@ namespace AsyncTest
         {
             None = 0x00,
             DereferenceLinks = 0x01,
-            OverwiteFiles = 0x02,
+            OverWriteFiles = 0x02,
             TopDirectoryOnly = 0x04
         }
 
@@ -33,13 +33,13 @@ namespace AsyncTest
 
         private static void InitializeInfo(DirInfo info, Options options)
         {
-            info.totalDirs = 1; // Because we count the base directory
+            info.totalDirs = 0; // Because we count the base directory
             info.totalFiles = 0;
             info.totalBytes = 0;
             info.dirOpts = options;
         }
 
-        public static DirInfo GetDirInfo(string path, Options options = Options.DereferenceLinks)
+        public static DirInfo GetDirInfo(string path, Options options = Options.None)
         {
             DirInfo info = new DirInfo();
             InitializeInfo(info, options);
@@ -53,10 +53,9 @@ namespace AsyncTest
 
             // Get the subdirectories for the specified directory.
             var directories = new List<string>(Directory.GetDirectories(srcPath));
-            inf.totalDirs += directories.Count();
+            //inf.totalDirs += directories.Count();
 
             var files = Directory.EnumerateFiles(srcPath);
-            //inf.totalFiles += files.Count();
 
             foreach (var file in files)
             {
@@ -96,6 +95,7 @@ namespace AsyncTest
             // Now do the subdirectories
             if (!info.dirOpts.HasFlag(Options.TopDirectoryOnly))
             {
+                inf.totalDirs += directories.Count();
                 foreach (string path in directories)
                 {
                     //inf.totalFiles = countAllFiles(path, inf.totalFiles);
@@ -107,16 +107,16 @@ namespace AsyncTest
         }
 
         public static async Task<DirInfo> AsyncDirectoryCopy(string srcPath, string dstPath,
-            Action<DirInfo> progressCallback, bool overwrite = false, Options options = Options.DereferenceLinks)
+            Action<DirInfo> progressCallback, bool overwrite = false, Options options = Options.None)
         {
             DirInfo info = new DirInfo();
             InitializeInfo(info, options);
-            info = await asyncDirectoryCopy(srcPath, dstPath, info, progressCallback, overwrite);
+            info = await asyncDirectoryCopy(srcPath, dstPath, info, progressCallback);
             return info;
         }
 
         private static async Task<DirInfo> asyncDirectoryCopy(string srcDir, string dstDir, DirInfo info, 
-            Action<DirInfo> progressCallback, bool overwrite)
+            Action<DirInfo> progressCallback)
         {
             DirInfo inf = info;
 
@@ -159,7 +159,7 @@ namespace AsyncTest
 
                     // Check to see if destination file exists.
                     // If it does skip it unless overwrite option is true.
-                    if (!File.Exists(dstFile) || overwrite)
+                    if (!File.Exists(dstFile) || info.dirOpts.HasFlag(Options.OverWriteFiles))
                     {
                         using (FileStream SourceStream = File.Open(srcFile, FileMode.Open))
                         {
@@ -192,7 +192,7 @@ namespace AsyncTest
                         Directory.CreateDirectory(fullDirName);
                     }
 
-                    inf = await asyncDirectoryCopy(path, fullDirName, inf, progressCallback, overwrite);
+                    inf = await asyncDirectoryCopy(path, fullDirName, inf, progressCallback);
                 }
             }
 

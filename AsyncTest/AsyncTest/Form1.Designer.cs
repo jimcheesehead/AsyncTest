@@ -43,6 +43,7 @@
             this.txtDstInput = new System.Windows.Forms.TextBox();
             this.chkBoxDereferenceLinks = new System.Windows.Forms.CheckBox();
             this.chkBoxOverwrite = new System.Windows.Forms.CheckBox();
+            this.chkBoxTopDirOnly = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -173,11 +174,22 @@
             this.chkBoxOverwrite.Text = "Overwrite existing files";
             this.chkBoxOverwrite.UseVisualStyleBackColor = true;
             // 
+            // chkBoxTopDirOnly
+            // 
+            this.chkBoxTopDirOnly.AutoSize = true;
+            this.chkBoxTopDirOnly.Location = new System.Drawing.Point(394, 58);
+            this.chkBoxTopDirOnly.Name = "chkBoxTopDirOnly";
+            this.chkBoxTopDirOnly.Size = new System.Drawing.Size(123, 17);
+            this.chkBoxTopDirOnly.TabIndex = 11;
+            this.chkBoxTopDirOnly.Text = "Do top directory only";
+            this.chkBoxTopDirOnly.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(608, 261);
+            this.Controls.Add(this.chkBoxTopDirOnly);
             this.Controls.Add(this.chkBoxOverwrite);
             this.Controls.Add(this.chkBoxDereferenceLinks);
             this.Controls.Add(this.txtDstInput);
@@ -215,6 +227,7 @@
         private System.Windows.Forms.TextBox txtDstInput;
         private System.Windows.Forms.CheckBox chkBoxDereferenceLinks;
         private System.Windows.Forms.CheckBox chkBoxOverwrite;
+        private System.Windows.Forms.CheckBox chkBoxTopDirOnly;
     }
 }
 

@@ -94,17 +94,25 @@ namespace AsyncTest
             totalDirs = totalFiles = 0;
 
             DirOps.DirInfo info;
-            DirOps.Options options = DirOps.Options.TopDirectoryOnly | DirOps.Options.DereferenceLinks;
+            DirOps.Options options = GetOptions();
 
             info = DirOps.GetDirInfo(srcPath, options); /*************************************************************************/
             totalFiles = info.totalFiles;
 
             // Show the the status of the background copying
 
-            text = String.Format("Copying {0} files, {1} folders ({2})",
-                info.totalFiles, info.totalDirs, GetBytesReadable(info.totalBytes));
-            if (info.badLinks.Count() > 0)
-                text += String.Format(" - {0} bad links", info.badLinks.Count());
+            if (options.HasFlag(DirOps.Options.TopDirectoryOnly))
+            {
+                text = String.Format("Copying {0} files ({1})",
+                    info.totalFiles, GetBytesReadable(info.totalBytes));
+            }
+            else
+            {
+                text = String.Format("Copying {0} files, {1} folders ({2})",
+                    info.totalFiles, info.totalDirs, GetBytesReadable(info.totalBytes));
+                if (info.badLinks.Count() > 0)
+                    text += String.Format(" - {0} bad links", info.badLinks.Count());
+            }
             lblStatus.Text = text;
             ProgressBar.Visible = true;
             lblPct.Visible = true;
@@ -251,11 +259,26 @@ namespace AsyncTest
                 text = "Done!";
             }
 
-            MessageBox.Show("Background Worker " + text);
+            //MessageBox.Show("Background Worker " + text);
 
             //ProgressBar.Value = 0;
         }
 
+        DirOps.Options GetOptions()
+        {
+            DirOps.Options options = new DirOps.Options();
+
+            options = DirOps.Options.None;
+            if (chkBoxOverwrite.Checked)
+            {
+                options |= DirOps.Options.OverWriteFiles;
+            }
+            if (chkBoxTopDirOnly.Checked)
+            {
+                options |= DirOps.Options.TopDirectoryOnly;
+            }
+            return options;
+        }
         private bool checkPathErrors()
         {
             string errMsg;
