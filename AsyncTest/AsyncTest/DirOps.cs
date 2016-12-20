@@ -82,7 +82,7 @@ namespace AsyncTest
                         // This file had a bad or missing target link
                         // MessageBox.Show(String.Format("File {0} does not exist", currentFile.FullName));
                         info.badLinks.Add(file);
-                        info.totalFiles++; // Count it anyway
+                        //info.totalFiles++; // Count it anyway
                         continue;
                     }
                 }
@@ -122,10 +122,11 @@ namespace AsyncTest
 
             // Get the subdirectories for the specified directory.
             var directories = new List<string>(Directory.GetDirectories(srcDir));
-            inf.totalDirs += directories.Count();
+            // inf.totalDirs += directories.Count();
 
             //var dirs = Directory.EnumerateDirectories(srcDir);
             var files = Directory.EnumerateFiles(srcDir);
+            int n = files.Count();
 
             foreach (string filename in files)
             {
@@ -133,6 +134,7 @@ namespace AsyncTest
                 string srcFile = filename;
                 string dstFile;
 
+                
                 if (ShortcutHelper.IsShortcut(filename))
                 {
                     srcFile = ShortcutHelper.ResolveShortcut(filename);
@@ -168,19 +170,25 @@ namespace AsyncTest
                                 await SourceStream.CopyToAsync(DestinationStream);
                             }
                         }
+
+                        FileInfo f = new FileInfo(dstFile);
+                        info.totalBytes += f.Length;
+                        info.totalFiles++;
                     }
 
-                    FileInfo f = new FileInfo(dstFile);
-                    info.totalBytes += f.Length;
+                    //FileInfo f = new FileInfo(dstFile);
+                    //info.totalBytes += f.Length;
+                    //info.totalFiles++;
                 }
 
-                info.totalFiles++;
+                //info.totalFiles++;
                 progressCallback(inf);
             }
 
             // Now copy the subdirectories recursively
             if (!info.dirOpts.HasFlag(Options.TopDirectoryOnly))
             {
+                inf.totalDirs += directories.Count();
                 foreach (string path in directories)
                 {
                     string dirName = path.Substring(path.LastIndexOf('\\'));
@@ -197,6 +205,12 @@ namespace AsyncTest
             }
 
             return inf;
+        }
+
+        public static int CountFiles(string path)
+        {
+            int fCount = Directory.GetFiles(path, "*", SearchOption.AllDirectories).Length;
+            return fCount;
         }
 
     }

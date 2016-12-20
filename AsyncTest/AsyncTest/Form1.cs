@@ -114,14 +114,19 @@ namespace AsyncTest
                     text += String.Format(" - {0} bad links", info.badLinks.Count());
             }
             lblStatus.Text = text;
+
+            int fCount = DirOps.CountFiles(srcPath);
+            MessageBox.Show("Source directory contains " + fCount + " files");
+
             ProgressBar.Visible = true;
             lblPct.Visible = true;
 
             backgroundWorker1.RunWorkerAsync();
 
-            await DirOps.AsyncDirectoryCopy(srcPath, dstPath, progressCallback,
-                chkBoxOverwrite.Checked, options); /*************************************************************************/
-            Task.WaitAll();
+            // Copy the source directory to the destination directory asynchronously
+            info = await DirOps.AsyncDirectoryCopy(srcPath, dstPath, progressCallback,
+                chkBoxOverwrite.Checked, options);
+            Task.WaitAll(); // Is this needed?
 
             text = String.Format("Done!\nCopyied {0} files, in {1} folders ({2})",
                 info.totalFiles, info.totalDirs, GetBytesReadable(info.totalBytes));
@@ -134,12 +139,22 @@ namespace AsyncTest
              * Need to stop the background worker here if it's running
              */
 
+            backgroundWorker1.CancelAsync();
+
             lblStatus.Text = "Ready";
 
             int endTotalFiles = fileCount;
 
             //ProgressBar.Visible = false;
             //lblPct.Visible = false;
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure?", "Cancel Copy", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                backgroundWorker1.CancelAsync();
+            }
         }
 
         private void progressCallback(DirOps.DirInfo obj)
@@ -218,6 +233,12 @@ namespace AsyncTest
 
             while (true)
             {
+                if (backgroundWorker1.CancellationPending)
+                {
+                    e.Cancel = true;
+                    break;
+                }
+
                 percentComplete = (int)((float)fileCount / (float)totalFiles * 100);
                 if (percentComplete >= 100)
                     break;
@@ -279,6 +300,7 @@ namespace AsyncTest
             }
             return options;
         }
+
         private bool checkPathErrors()
         {
             string errMsg;

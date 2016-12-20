@@ -44,6 +44,7 @@
             this.chkBoxDereferenceLinks = new System.Windows.Forms.CheckBox();
             this.chkBoxOverwrite = new System.Windows.Forms.CheckBox();
             this.chkBoxTopDirOnly = new System.Windows.Forms.CheckBox();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -53,7 +54,7 @@
             this.txtSrcInput.Name = "txtSrcInput";
             this.txtSrcInput.Size = new System.Drawing.Size(382, 20);
             this.txtSrcInput.TabIndex = 0;
-            this.txtSrcInput.Text = "C:\\tmp";
+            this.txtSrcInput.Text = "C:\\tmp3";
             // 
             // label1
             // 
@@ -75,7 +76,7 @@
             // 
             // btnCopy
             // 
-            this.btnCopy.Location = new System.Drawing.Point(136, 85);
+            this.btnCopy.Location = new System.Drawing.Point(26, 94);
             this.btnCopy.Name = "btnCopy";
             this.btnCopy.Size = new System.Drawing.Size(75, 23);
             this.btnCopy.TabIndex = 4;
@@ -184,11 +185,22 @@
             this.chkBoxTopDirOnly.Text = "Do top directory only";
             this.chkBoxTopDirOnly.UseVisualStyleBackColor = true;
             // 
+            // btnCancel
+            // 
+            this.btnCancel.Location = new System.Drawing.Point(145, 93);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(75, 23);
+            this.btnCancel.TabIndex = 12;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(608, 261);
+            this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.chkBoxTopDirOnly);
             this.Controls.Add(this.chkBoxOverwrite);
             this.Controls.Add(this.chkBoxDereferenceLinks);
@@ -228,6 +240,7 @@
         private System.Windows.Forms.CheckBox chkBoxDereferenceLinks;
         private System.Windows.Forms.CheckBox chkBoxOverwrite;
         private System.Windows.Forms.CheckBox chkBoxTopDirOnly;
+        private System.Windows.Forms.Button btnCancel;
     }
 }
 
