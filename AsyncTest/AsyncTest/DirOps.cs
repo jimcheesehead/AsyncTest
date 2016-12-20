@@ -107,7 +107,7 @@ namespace AsyncTest
         }
 
         public static async Task<DirInfo> AsyncDirectoryCopy(string srcPath, string dstPath,
-            Action<DirInfo> progressCallback, bool overwrite = false, Options options = Options.None)
+            Action<DirInfo> progressCallback, Options options = Options.None)
         {
             DirInfo info = new DirInfo();
             InitializeInfo(info, options);
@@ -211,6 +211,14 @@ namespace AsyncTest
         {
             int fCount = Directory.GetFiles(path, "*", SearchOption.AllDirectories).Length;
             return fCount;
+        }
+
+        public static DirInfo CountDirs(string path)
+        {
+            DirInfo info = new DirInfo();
+            info.totalDirs = System.IO.Directory.GetDirectories(path, "*", SearchOption.AllDirectories).Length;
+            info.totalFiles = Directory.GetFiles(path, "*", SearchOption.AllDirectories).Length;
+            return info;
         }
 
     }

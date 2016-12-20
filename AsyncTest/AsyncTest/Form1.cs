@@ -115,8 +115,9 @@ namespace AsyncTest
             }
             lblStatus.Text = text;
 
-            int fCount = DirOps.CountFiles(srcPath);
-            MessageBox.Show("Source directory contains " + fCount + " files");
+            DirOps.DirInfo inf = DirOps.CountDirs(srcPath);
+            text = String.Format("Contains {0} files, {1} folders", inf.totalFiles, inf.totalDirs);
+            MessageBox.Show(text);
 
             ProgressBar.Visible = true;
             lblPct.Visible = true;
@@ -124,8 +125,8 @@ namespace AsyncTest
             backgroundWorker1.RunWorkerAsync();
 
             // Copy the source directory to the destination directory asynchronously
-            info = await DirOps.AsyncDirectoryCopy(srcPath, dstPath, progressCallback,
-                chkBoxOverwrite.Checked, options);
+            info = await DirOps.AsyncDirectoryCopy(srcPath, dstPath, 
+                progressCallback, options);
             Task.WaitAll(); // Is this needed?
 
             text = String.Format("Done!\nCopyied {0} files, in {1} folders ({2})",
